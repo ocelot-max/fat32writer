@@ -1,0 +1,6 @@
+make.exe --dry-run --keep-going --print-directory
+make.exe: Entering directory 'd:/workplace/FAT32Writer/fat32writer'
+make.exe: Leaving directory 'd:/workplace/FAT32Writer/fat32writer'
+ 
+make.exe: *** No targets specified and no makefile found.  Stop.
+ 
