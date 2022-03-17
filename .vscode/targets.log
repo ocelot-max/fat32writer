@@ -7,7 +7,7 @@ make.exe all --print-data-base --no-builtin-variables --no-builtin-rules --quest
 # There is NO WARRANTY, to the extent permitted by law.
  
 
-# Make data base, printed on Thu Mar 17 08:35:20 2022
+# Make data base, printed on Thu Mar 17 09:25:21 2022
 
 # Variables
 
@@ -32,8 +32,7 @@ HOMEDRIVE = C:
 # automatic
 ^D = $(patsubst %/,%,$(patsubst %\,%,$(dir $^)))
 # makefile
-CUR 
-DIR := d:/workplace/FAT32Writer/fat32writer
+CURDIR := d:/workplace/FAT32Writer/fat32writer
 # default
 SHELL := sh.exe
 # environment
@@ -50,8 +49,7 @@ MAKEFILE_LIST :=
 # environment
 TMP = C:\Users\33104\AppData\Local\Temp
 # environment
-VSCODE_VE 
-RBOSE_LOGGING = true
+VSCODE_VERBOSE_LOGGING = true
 # environment
 PROGRAMW6432 = C:\Program Files
 # environment
@@ -68,8 +66,7 @@ COMMONPROGRAMW6432 = C:\Program Files\Common Files
 PROCESSOR_ARCHITECTURE = x86
 # environment
 USERPROFILE = C:\Users\33104
-# envir 
-onment
+# environment
 ALLUSERSPROFILE = C:\ProgramData
 # environment
 VSCODE_LOG_STACK = false
@@ -105,8 +102,7 @@ VSCODE_CODE_CACHE_PATH = C:\Users\33104\AppData\Roaming\Code\CachedData\c722ca6c
 # environment
 APPLICATION_INSIGHTS_NO_DIAGNOSTIC_CHANNEL = 1
 # environment
-COMMONPROGRAMFIL 
-ES = C:\Program Files (x86)\Common Files
+COMMONPROGRAMFILES = C:\Program Files (x86)\Common Files
 # environment
 LOGONSERVER = \\DESKTOP-E1L0MVR
 # environment
@@ -197,8 +193,7 @@ PROCESSOR_REVISION = 3d04
 LANG = C
 # environment
 PROCESSOR_LEVEL = 6
-# enviro 
-nment
+# environment
 VSCODE_PID = 13168
 # environment
 USERDOMAIN_ROAMINGPROFILE = DESKTOP-E1L0MVR
@@ -228,8 +223,7 @@ impossibilities.
 # E:\platform-tools (key E:/platform-tools, mtime 1643973176): 18 files, no impossibilities.
 # E:\Git\cmd (key E:/Git/cmd, mtime 1647437954): 8 files, no impossibilities.
 # D:\workplace\WiselotOS\tools\Bochs-2.7: could not be stat'd.
-# C:\Windows\System32\Wb 
-em (key C:/Windows/System32/Wbem, mtime 1644648891): 172 files, no impossibilities.
+# C:\Windows\System32\Wbem (key C:/Windows/System32/Wbem, mtime 1644648891): 172 files, no impossibilities.
 # D:\workplace\WiselotOS\tools\linux-cross: could not be stat'd.
 # D:\workplace\wiselotOS\MinGW\bin: could not be stat'd.
 # C:\Windows\system32 (key C:/Windows/system32, mtime 1647433751): 2942 files, no impossibilities.
@@ -263,8 +257,7 @@ Makefile:
 #  Implicit rule search has been done.
 #  File does not exist.
 #  File has been updated.
-#   
-Failed to be updated.
+#  Failed to be updated.
 
 # Not a target:
 makefile:
@@ -303,8 +296,7 @@ GNUmakefile:
 # strcache performance: lookups = 3589 / hit rate = 2%
 # hash-table stats:
 # Load=3503/8192=43%, Rehash=0, Collisions=1201/3589=33%
-# Finish 
-ed Make data base on Thu Mar 17 08:35:20 2022
+# Finished Make data base on Thu Mar 17 09:25:21 2022
 
  
 make.exe: *** No rule to make target 'all'.  Stop.
