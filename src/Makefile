@@ -13,6 +13,6 @@ all: $(OBJECTS)
 	$(MAKE) clean
 .PHYON: clean
 clean:
-#	-$(RM) $(OBJECTS)
+	-$(RM) $(OBJECTS)
 %.o: %.c
 	$(CC) $(CFLAGS) -c -o $@ $^
