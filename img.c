@@ -109,7 +109,7 @@ static void fillFileDesc(char *buf,int index,fat32_files *ff)
 		return;
 	}
 	buf+=index*32;
-	ff->start_sector = bin2Short(buf,0x1a)|bin2Short(buf,0x14);
+	ff->start_sector = bin2Short(buf,0x1a)|(bin2Short(buf,0x14))<<16;
 	ff->length = bin2Short(buf,0x1c);
 	ff->next = (fat32_files *)malloc(sizeof(fat32_files));
 	ff->name = (char *)malloc(sizeof(char)*9);	// You see,I'm too lazy to support long name
