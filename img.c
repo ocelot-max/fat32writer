@@ -21,7 +21,8 @@ struct _fat32_files
 	char *name;
 	char *ext;
 	unsigned int start_sector;
-	unsigned short length;
+	unsigned int length;
+	unsigned char flag;
 	struct _fat32_files *next;
 };
 
@@ -99,75 +100,128 @@ int open_disk(char *path)
 	disk.fat_num = buf[0x10];
 	disk.sectors_per_fat = bin2Int(buf,0x24);
 	disk.root_start_sector = bin2Int(buf,0x2c);
-}
-
-static void fillFileDesc(char *buf,int index,fat32_files *ff)
-{
-	if(index>=16)
-	{
-		ff->length = 0;
-		return;
-	}
-	buf+=index*32;
-	ff->start_sector = bin2Short(buf,0x1a)|(bin2Short(buf,0x14))<<16;
-	ff->length = bin2Short(buf,0x1c);
-	ff->next = (fat32_files *)malloc(sizeof(fat32_files));
-	ff->name = (char *)malloc(sizeof(char)*9);	// You see,I'm too lazy to support long name
-	char *_name = buf;
-	memcpy(ff->name,_name,sizeof(ff->name)-1);
-	ff->name[8] = '\0';
-	ff->ext = (char *)malloc(sizeof(buf)*4);	// qwq
-	char *_ext = buf;
-	_ext+=0x08;
-	memcpy(ff->ext,_ext,sizeof(ff->ext)-1);
-	ff->ext[8] = '\0';
 	
 }
 
 fat32_files *getGroundFileTree()
 {
-	char buf[512];
-	short i = 0;
 	fat32_files *tree = (fat32_files *)malloc(sizeof(fat32_files));
 	fat32_files *head = tree;
-	do{
-		if(i%16==0)
-			readSectors(buf,1,disk.save_sectors+disk.sectors_per_fat*disk.fat_num+(i/16)*512);
-		fillFileDesc(buf,i%16,tree);
-		tree = tree->next;
-		i++;
-	}while(i<=5);
-	/* 明天再做:
-	 * bug: Found file:Aa. in clu -1 length:65535B
-Found file:A      .TXT  in clu 34 length:83B
-Found file:��. in clu -124 length:113B
-Found file:坫���~.    in clu 4 length:0B
-Found file:�a. in clu -1 length:65535B
-Found file:�      .TXT  in clu 33 length:83B
-Found file:(null).(null) in clu 0 length:0B
-	* 懂?,OK
-	*/
+	char *buf = (char *)malloc(512);
+	char *ba = buf;
+	unsigned long rindex = disk.save_sectors+disk.sectors_per_fat*disk.fat_num;
+	int c;
+	while(1)
+	{
+		if(c%16==0)
+			readSectors(buf,1,rindex+c/16);
+		for(c=0;;c++)
+		{
+			tree->flag = buf[0x0b];
+			tree->start_sector = bin2Short(buf,0x1a)|bin2Short(buf,0x14)<<16;
+			tree->length = bin2Int(buf,0x1c);
+			if(tree->flag==0&&tree->start_sector==0&&tree->length==0)
+				goto ret;
+			char *_name = buf;
+			char *_ext = buf+0x08;
+			tree->name = (char *)malloc(9);
+			tree->ext = (char *)malloc(4);
+			memcpy(tree->name,_name,8);
+			int i;
+			for(i=0;i<8;i++)
+			{
+				if(tree->name[i]==0x20){
+					tree->name[i] = '\0';
+					break;
+				}
+			}
+			tree->name[8] = '\0';
+			memcpy(tree->ext,_ext,3);
+			for(i=0;i<3;i++)
+			{
+				if(tree->ext[i]==0x20){
+					tree->ext[i] = '\0';
+					break;
+				}
+			}
+			tree->ext[3] = '\0';
+			if(buf[0x0]==0xe5||tree->flag!=0x20)
+				// 现在只扫描文件
+				tree->next = tree;
+			else
+				tree->next = (fat32_files *)malloc(sizeof(fat32_files));
+	
+			tree = tree->next;
+			buf+=32;
+		}
+		buf = ba;
+	}
+ret:
 	tree->next = NULL;
 	return head;
 }
 
+char *readFile(fat32_files *info,unsigned int start_sector,unsigned int sectors)
+{
+	if(info==NULL||info->length==0||info->flag!=0x20||
+			start_sector>info->length/512||start_sector+sectors>info->length/512)
+		return NULL;
+	char *data = (char *)malloc(512*sectors);
+	//(char *)malloc(info->length); 这样写在文件足够大(具体取绝于机器)时会导致段错误
+	char *bdata = data;
+	char _fat[512];
+	char *fat = (char *)&_fat;
+	char *ba = fat;
+	readSectors(fat,1,disk.save_sectors+info->start_sector/128);
+	unsigned long sindex = disk.save_sectors+disk.sectors_per_fat*disk.fat_num+info->start_sector-2;
+	readSectors(data,1,sindex);
+	int enity = bin2Int(fat,sizeof(int)*info->start_sector);
+	int c = 0;
+	while(enity<0xfffffff8&&start_sector>c)
+	{
+		if(c%128==0&&c>0)
+			readSectors(fat,1,disk.save_sectors+info->start_sector/128+c/128);
+		enity = bin2Int(fat,sizeof(int)*enity);
+		readSectors(data,1,sindex+enity);
+		c++;
+	}
+	
+	return bdata;
+}
+
+fat32_files *new_file(char *name,char *ext)
+{
+
+}
+
 void close_disk()
 {
-	fclose(fp);
+	if(fp==NULL)
+		fclose(fp);
 }
 
 int main()
 {
-	if(open_disk("c.img")==-1){
+	if(open_disk("a.img")==-1){
 		printf("Open disk failed!\n");
 		close_disk();
 		return 1;
 	}
 	printf("%d,%d,%d,%d,%d\n",disk.sectors_per_cul,disk.save_sectors,(int)disk.fat_num,disk.sectors_per_fat,disk.root_start_sector);
 	fat32_files * gtree = getGroundFileTree();
+	int i;
+	char *a;
+	for(i=0;i<gtree->length/512;i++)
+	{
+		a = readFile(gtree,i,1);
+		sleep(1);
+		printf("%s",a);
+		fflush(stdout);
+	}
+	printf("%s",a);
 	while(gtree!=NULL)
 	{
-		printf("Found file:%s.%s in clu %d length:%dB\n",gtree->name,gtree->ext,gtree->start_sector,gtree->length);
+		printf("Found file:%s.%s in clu %d length:%dB,with flag %d\n",gtree->name,gtree->ext,gtree->start_sector,gtree->length,(int)gtree->flag);
 		gtree = gtree->next;
 	}
 	close_disk();
